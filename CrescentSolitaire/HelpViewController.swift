@@ -32,8 +32,7 @@ How to Move Cards
 
 Click/Drag the desired card to the destination pile.
 
-Single Tap to move card to Aces home pile.
-Double tap to move card to Kings home pile.
+shortcut command: Tap to move card to home pile.
 
 Long press on pile for a list of all cards within.
 """

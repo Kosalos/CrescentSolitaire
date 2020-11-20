@@ -247,6 +247,7 @@ class Game {
         }
         
         bIndex = EMPTY
+       // debug()
     }
     
     // MARK:-
@@ -281,15 +282,7 @@ class Game {
             }
         }
         
-        if hintCount == 0 {
-            var alertController:UIAlertController! = nil
-            alertController = UIAlertController(title: "No moves", message: "\nShuffle if possible", preferredStyle: .alert)
-
-            let okAction = UIAlertAction(title: "OK", style: .cancel) { (action:UIAlertAction!) in self.isShowingAlert = false }
-            alertController.addAction(okAction)
-
-            vc.present(alertController, animated: true, completion:nil)
-        }
+        if hintCount == 0 { alert("No moves", "\nShuffle if possible")  }
     }
     
     // MARK:- tap to move selected card to home pile
@@ -302,15 +295,31 @@ class Game {
         let card = cards.cardData[cardIndex]
         dIndex = baseIndex - card.suit
         
+        print("move %d - %d",bIndex,dIndex)
+        
         performCardMove()
     }
     
-    func tap1(_ pt:CGPoint) {   // 1 tap for Aces piles
-        tapMove(pt,NUMSPOTS - 1)
-    }
-    
-    func tap2(_ pt:CGPoint) {   // 2 taps for Kings piles
-        tapMove(pt,NUMSPOTS - 5)
+    func tap(_ pt:CGPoint) {
+        bIndex = determineBoardIndex(pt)
+        if bIndex == EMPTY { return }
+        let cardIndex = cardIndexOfTopOfStack(bIndex)
+        let card = cards.cardData[cardIndex]
+
+        // drop on Aces pile?
+        let d1 = NUMSPOTS - 1 - card.suit
+        if isLegalToDropCardAtIndex(cardIndex,d1) {
+            dIndex = d1
+            performCardMove()
+            return
+        }
+
+        // drop on Kings pile?
+        let d2 = NUMSPOTS - 5 - card.suit
+        if isLegalToDropCardAtIndex(cardIndex,d2) {
+            dIndex = d2
+            performCardMove()
+        }
     }
     
     var isShowingAlert:Bool = false
@@ -334,13 +343,7 @@ class Game {
             str = str + name(card.suit,card.rank) + "\n"
         }
         
-        var alertController:UIAlertController! = nil
-        alertController = UIAlertController(title: "Cards in Pile", message: str, preferredStyle: .alert)
-        
-        let okAction = UIAlertAction(title: "OK", style: .cancel) { (action:UIAlertAction!) in self.isShowingAlert = false }
-        alertController.addAction(okAction)
-        
-        vc.present(alertController, animated: true, completion:nil)
+        alert("Cards in Pile",str)
     }
     
     func updateZOrder() {
@@ -391,6 +394,9 @@ class Game {
         
         gd.shuffleCount += 1
         vc.updateShuffleButton()
+        
+        //print("shuffle")
+        //debug()
     }
     
     // MARK:-
@@ -455,5 +461,31 @@ class Game {
     
     func updateUndoButton() {
         vc.enableUndoButton(undoCount > 0)
+    }
+    
+    func alert(_ title:String, _ message:String) {
+        var alertController:UIAlertController! = nil
+        alertController = UIAlertController(title:title, message:message, preferredStyle: .alert)
+
+        let okAction = UIAlertAction(title: "OK", style: .cancel) { (action:UIAlertAction!) in self.isShowingAlert = false }
+        alertController.addAction(okAction)
+
+        vc.present(alertController, animated: true, completion:nil)
+    }
+    
+    func debug() {
+        print("---------------------------------")
+        for i in 0 ..< NUMSPOTS {
+            
+            var str = String(format:"%d (%d) : ",i,gd.board[i].stack.count)
+            
+            for s in 0 ..< gd.board[i].stack.count {
+                let card = cards.cardData[gd.board[i].stack[s]]
+                str = str + name(card.suit,card.rank) + ", "
+            }
+            
+            //str += "\n"
+            print(str)
+        }
     }
 }

@@ -37,10 +37,6 @@ class ViewController: UIViewController {
         tap1.numberOfTapsRequired = 1
         view.addGestureRecognizer(tap1)
         
-        let tap2 = UITapGestureRecognizer(target: self, action: #selector(self.handleTap2(_:)))
-        tap2.numberOfTapsRequired = 2
-        view.addGestureRecognizer(tap2)
-        
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(self.handleLongPress(_:)))
         view.addGestureRecognizer(longPress)
     }
@@ -68,8 +64,7 @@ class ViewController: UIViewController {
     
     func updateScore() { scoreLabel.text = String(format:"Score: %d",game.score) }
     
-    @objc func handleTap1(_ sender: UITapGestureRecognizer) { game.tap1(sender.location(ofTouch:0, in: self.view)) }
-    @objc func handleTap2(_ sender: UITapGestureRecognizer) { game.tap2(sender.location(ofTouch:0, in: self.view)) }
+    @objc func handleTap1(_ sender: UITapGestureRecognizer) { game.tap(sender.location(ofTouch:0, in: self.view)) }
     @objc func handleLongPress(_ sender: UILongPressGestureRecognizer) { game.longPress(sender.location(ofTouch:0, in: self.view)) }
     
     @IBAction func newGame(_ sender:UIButton) { game.newGame() }
