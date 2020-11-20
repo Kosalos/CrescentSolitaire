@@ -252,6 +252,7 @@ class Game {
     // MARK:-
     
     func hint() {
+        var hintCount = 0
         var hintDelay:TimeInterval = 0.1
         
         for i in 0 ..< NUMSPOTS {
@@ -274,8 +275,20 @@ class Game {
                 hintDelay += 0.2
                 
                 animateMove(0,0)
-                hintDelay += 0.5
+                hintDelay += 0.3
+                
+                hintCount += 1
             }
+        }
+        
+        if hintCount == 0 {
+            var alertController:UIAlertController! = nil
+            alertController = UIAlertController(title: "No moves", message: "\nShuffle if possible", preferredStyle: .alert)
+
+            let okAction = UIAlertAction(title: "OK", style: .cancel) { (action:UIAlertAction!) in self.isShowingAlert = false }
+            alertController.addAction(okAction)
+
+            vc.present(alertController, animated: true, completion:nil)
         }
     }
     
@@ -350,12 +363,27 @@ class Game {
     // MARK:- rotate cards in tableau stacks
     
     func shuffle() {
+        var delay:TimeInterval = 0.1
+        
         for i in 0 ..< NUMSPOTS - 8 {  // not for home piles
             let count = gd.board[i].stack.count
             if count > 1 {
                 let t = gd.board[i].stack[0]
+                
+                func animateMove(_ x:CGFloat, _ y:CGFloat) {
+                    UIView.animate(withDuration: 0.2, delay: delay, options: .curveLinear, animations: {
+                        cards.setDeltaPosition(t,x,y)
+                    }, completion: nil )
+                }
+            
                 for m in 0 ..< count-1 { gd.board[i].stack[m] = gd.board[i].stack[m+1] }
                 gd.board[i].stack[count-1] = t
+                
+                animateMove(0,300)
+                delay += 0.01
+                
+                animateMove(0,0)
+                delay += 0.001
             }
         }
         
